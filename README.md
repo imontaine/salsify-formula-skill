@@ -92,7 +92,45 @@ Copy-Item -Recurse -Force "skill-src\salsify-formula-writer" "$HOME\.claude\skil
 
 Claude Code normally detects changes inside an existing skills directory immediately. Restart it if the top-level skills directory was created after the session started.
 
-## Using the skill
+## Quick start: invoke the skill
+
+### Claude Code
+
+After installation, open Claude Code and type `/salsify-formula-writer`, followed by the request:
+
+```text
+/salsify-formula-writer Create a Computed Property formula that returns 10 when iq_department is Skincare and 3 otherwise.
+```
+
+```text
+/salsify-formula-writer Create a Templated Export formula that returns 1 when calc_max_sale_qty is greater than 0 and 0 otherwise.
+```
+
+The default command is `/salsify-formula-writer`, not `/salsify`, because Claude Code derives the command from the installed skill directory name.
+
+### Codex
+
+In Codex CLI or the IDE extension, type `$salsify-formula-writer`, followed by the request:
+
+```text
+$salsify-formula-writer Create a Computed Property formula that returns 10 when iq_department is Skincare and 3 otherwise.
+```
+
+```text
+$salsify-formula-writer Create a Templated Export formula that returns 1 when calc_max_sale_qty is greater than 0 and 0 otherwise.
+```
+
+You can also type `/skills` in Codex CLI or the IDE extension, find `salsify-formula-writer`, and select it.
+
+### Automatic invocation
+
+Both clients can load the skill automatically when a request matches its description. Explicit invocation is useful when you want to guarantee that the specialized Salsify references and validator are used.
+
+```text
+Create a Salsify Readiness Report formula that returns true when Brand and Product Title both have values.
+```
+
+## What to include in a request
 
 State the formula area whenever possible because Salsify function compatibility and syntax can vary by context.
 
@@ -104,34 +142,6 @@ Useful request details include:
 - Required output
 - Behavior for null, blank, or unmatched values
 - Whether the result must be a scalar or an array
-
-### Codex
-
-Invoke it explicitly with `$salsify-formula-writer`:
-
-```text
-$salsify-formula-writer Create a Computed Property formula that returns 10 when iq_department is Skincare and 3 otherwise.
-```
-
-```text
-$salsify-formula-writer Create a Templated Export formula that returns 1 when calc_max_sale_qty is greater than 0 and 0 otherwise.
-```
-
-Codex may also activate the skill automatically when a request matches its description.
-
-### Claude Code
-
-Invoke it explicitly with `/salsify-formula-writer`:
-
-```text
-/salsify-formula-writer Create a Computed Property formula that returns 10 when iq_department is Skincare and 3 otherwise.
-```
-
-```text
-/salsify-formula-writer Create a Templated Export formula that returns 1 when calc_max_sale_qty is greater than 0 and 0 otherwise.
-```
-
-Claude Code may also activate the skill automatically when a request matches its description.
 
 ## General request examples
 

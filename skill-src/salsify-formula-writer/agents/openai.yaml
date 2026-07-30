@@ -1,0 +1,4 @@
+interface:
+  display_name: "Salsify Formula Writer"
+  short_description: "Write and troubleshoot grounded Salsify formulas"
+  default_prompt: "Use $salsify-formula-writer to create a Salsify formula from my property IDs and desired output."

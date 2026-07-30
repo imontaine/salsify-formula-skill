@@ -1,317 +1,223 @@
-# Salsify Formula Writer Skill
+# Salsify Formula Writer
 
-An Agent Skill for creating, explaining, validating, troubleshooting, and optimizing formulas in the Salsify ProductXM formula language.
+A reusable AI skill for creating, explaining, validating, and troubleshooting formulas in the Salsify ProductXM formula language.
 
-The same skill package works with both OpenAI Codex and Anthropic Claude Code because it follows the [Agent Skills open standard](https://agentskills.io/specification): a `SKILL.md` file with bundled references and scripts.
+It works with both Claude Code and OpenAI Codex and includes the Salsify function cheat sheet, examples, compatibility rules, arrays, variables, time zones, and Templated Export requirements.
 
-## What it provides
+## Install it globally
 
-- A catalog of 128 Salsify functions with syntax, examples, and formula-area compatibility.
-- Guidance for Computed Properties, Readiness Reports, Templated Exports, In-app Bulk Edits, Salsibot Product Edits, and Digital Asset Renaming.
-- Specialized references for common use cases, arrays, variables, time zones, and Templated Export formulas.
-- A deterministic formula linter that checks syntax structure, function names, context compatibility, smart quotes, placeholders, and Templated Export prefixes.
-- For Templated Exports, both a readable multiline verification formula and an equivalent one-line formula for the Salsify formula box.
+You do not need to copy files manually. Ask your AI coding agent to install the skill from this repository.
 
-The linter performs local lexical checks. It does not execute formulas or validate property IDs against a Salsify organization.
+### Claude Code
 
-## Repository layout
+Paste this into Claude Code:
 
 ```text
-skill-src/
-└── salsify-formula-writer/
-    ├── SKILL.md
-    ├── agents/
-    │   └── openai.yaml
-    ├── references/
-    └── scripts/
-        └── lint_formula.py
-```
+Install the salsify-formula-writer skill globally from this GitHub repository:
+https://github.com/imontaine/salsify-formula-skill
 
-Install the entire `skill-src/salsify-formula-writer` directory. The `agents/openai.yaml` file provides optional Codex UI metadata and does not affect Claude Code.
-
-## Installation
-
-Clone the repository:
-
-```bash
-git clone https://github.com/imontaine/salsify-formula-skill.git
-cd salsify-formula-skill
+The skill folder in the repository is:
+skill-src/salsify-formula-writer
 ```
 
 ### Codex
 
-Codex discovers personal skills in `~/.agents/skills` and project skills in `.agents/skills`.
+Paste this into Codex:
 
-Personal installation:
+```text
+$skill-installer Install the salsify-formula-writer skill globally from this GitHub repository:
+https://github.com/imontaine/salsify-formula-skill
 
-```bash
-mkdir -p ~/.agents/skills
-cp -R skill-src/salsify-formula-writer ~/.agents/skills/
+The skill folder in the repository is:
+skill-src/salsify-formula-writer
 ```
 
-Project installation:
-
-```bash
-mkdir -p .agents/skills
-cp -R skill-src/salsify-formula-writer .agents/skills/
-```
-
-PowerShell personal installation:
-
-```powershell
-New-Item -ItemType Directory -Path "$HOME\.agents\skills" -Force
-Copy-Item -Recurse -Force "skill-src\salsify-formula-writer" "$HOME\.agents\skills\"
-```
-
-Codex detects skill changes automatically. Restart Codex if the skill does not appear.
+## Use the skill
 
 ### Claude Code
 
-Claude Code discovers personal skills in `~/.claude/skills` and project skills in `.claude/skills`.
-
-Personal installation:
-
-```bash
-mkdir -p ~/.claude/skills
-cp -R skill-src/salsify-formula-writer ~/.claude/skills/
-```
-
-Project installation:
-
-```bash
-mkdir -p .claude/skills
-cp -R skill-src/salsify-formula-writer .claude/skills/
-```
-
-PowerShell personal installation:
-
-```powershell
-New-Item -ItemType Directory -Path "$HOME\.claude\skills" -Force
-Copy-Item -Recurse -Force "skill-src\salsify-formula-writer" "$HOME\.claude\skills\"
-```
-
-Claude Code normally detects changes inside an existing skills directory immediately. Restart it if the top-level skills directory was created after the session started.
-
-## Quick start: invoke the skill
-
-### Claude Code
-
-After installation, open Claude Code and type `/salsify-formula-writer`, followed by the request:
+Type `/salsify-formula-writer`, followed by your request:
 
 ```text
-/salsify-formula-writer Create a Computed Property formula that returns 10 when iq_department is Skincare and 3 otherwise.
+/salsify-formula-writer Create a Salsify Computed Property formula that returns "Unknown" when Brand is blank and otherwise returns Brand.
 ```
-
-```text
-/salsify-formula-writer Create a Templated Export formula that returns 1 when calc_max_sale_qty is greater than 0 and 0 otherwise.
-```
-
-The default command is `/salsify-formula-writer`, not `/salsify`, because Claude Code derives the command from the installed skill directory name.
 
 ### Codex
 
-In Codex CLI or the IDE extension, type `$salsify-formula-writer`, followed by the request:
+Type `$salsify-formula-writer`, followed by your request:
 
 ```text
-$salsify-formula-writer Create a Computed Property formula that returns 10 when iq_department is Skincare and 3 otherwise.
+$salsify-formula-writer Create a Salsify Computed Property formula that returns "Unknown" when Brand is blank and otherwise returns Brand.
 ```
+
+Both clients can also activate the skill automatically when you ask for a Salsify formula. Explicitly invoking it makes sure the specialized references and validator are used.
+
+> The default Claude command is `/salsify-formula-writer`, not `/salsify`, because the command comes from the installed skill directory name.
+
+## Always name the formula area
+
+This is the most important part of the request. Salsify syntax and function compatibility change depending on where the formula will be used.
+
+| Formula area | How to ask | Important behavior |
+| --- | --- | --- |
+| Computed Property | "Create a Salsify Computed Property formula..." | Uses normal function names such as `IF` and `VALUE`. |
+| Templated Export | "Create a Salsify Templated Export formula..." | Every function needs the `SALSIFY_` prefix. The final formula must be one line. |
+| Readiness Report | "Create a Salsify Readiness Report formula..." | Uses normal unprefixed function names. |
+| In-app Bulk Edit | "Create a Salsify In-app Bulk Edit formula..." | The skill checks every function for Bulk Edit compatibility. |
+| Digital Asset Renaming | "Create a Salsify Digital Asset Renaming formula..." | Only asset-renaming-compatible functions may be used. |
+
+Salsify calls a calculated property a **Computed Property**. The skill understands either phrase, but using "Computed Property" is clearest.
+
+## Computed Property vs. Templated Export
+
+Here is the same business rule requested in the two different contexts.
+
+### Ask for a Computed Property
 
 ```text
-$salsify-formula-writer Create a Templated Export formula that returns 1 when calc_max_sale_qty is greater than 0 and 0 otherwise.
+Create a Salsify Computed Property formula for the property "Category".
+Return "Y" when Category is "R/C Cars" and return "N" for every other category.
+Return null when Category is blank.
 ```
 
-You can also type `/skills` in Codex CLI or the IDE extension, find `salsify-formula-writer`, and select it.
-
-### Automatic invocation
-
-Both clients can load the skill automatically when a request matches its description. Explicit invocation is useful when you want to guarantee that the specialized Salsify references and validator are used.
+The generated functions are unprefixed:
 
 ```text
-Create a Salsify Readiness Report formula that returns true when Brand and Product Title both have values.
+IF(
+  VALUE("Category"),
+  IF(EQUAL(VALUE("Category"), "R/C Cars"), "Y", "N"),
+  null
+)
 ```
 
-## What to include in a request
+### Ask for a Templated Export
 
-State the formula area whenever possible because Salsify function compatibility and syntax can vary by context.
+```text
+Create a Salsify Templated Export formula for the property "Category".
+Return "Y" when Category is "R/C Cars" and return "N" for every other category.
+Return null when Category is blank.
+Give me a readable multiline version for verification and a one-line version to paste into the formula box.
+```
 
-Useful request details include:
+The verification version uses `SALSIFY_` on every function:
 
-- Formula area, such as Computed Property or Templated Export
+```text
+SALSIFY_IF(
+  SALSIFY_VALUE("Category"),
+  SALSIFY_IF(
+    SALSIFY_EQUAL(SALSIFY_VALUE("Category"), "R/C Cars"),
+    "Y",
+    "N"
+  ),
+  null
+)
+```
+
+The skill also returns the required one-line version:
+
+```text
+SALSIFY_IF(SALSIFY_VALUE("Category"),SALSIFY_IF(SALSIFY_EQUAL(SALSIFY_VALUE("Category"),"R/C Cars"),"Y","N"),null)
+```
+
+## Examples from the Salsify cheat sheet
+
+### Return a default value
+
+```text
+Create a Salsify Computed Property formula that returns the first populated value from "Brand", "Manufacturer", or "Supplier Name". Return "Unknown" when all three properties are blank.
+```
+
+### Add leading zeros
+
+```text
+Create a Salsify Computed Property formula that pads "UPC" with leading zeros until it contains 12 characters. Preserve null when UPC is blank.
+```
+
+### Change date formatting
+
+```text
+Create a Salsify Templated Export formula that formats "Launch Date" as MM/DD/YYYY. Include the multiline verification formula and the one-line copy formula.
+```
+
+### Convert inches to centimeters
+
+```text
+Create a Salsify Computed Property formula that converts "Product Length" from inches to centimeters by multiplying by 2.54. Round to two decimal places and return null when Product Length is blank.
+```
+
+### Create a true/false readiness check
+
+```text
+Create a Salsify Readiness Report formula that returns true when both "Brand" and "Product Title" contain values. Return false otherwise.
+```
+
+### Join multiple values
+
+```text
+Create a Salsify Templated Export formula that joins every value from "Bullet Points" using a pipe with spaces around it: " | ".
+```
+
+### Remove unwanted characters
+
+```text
+Create a Salsify Computed Property formula that removes special characters and symbols from "Product Name" while keeping letters, numbers, spaces, and hyphens.
+```
+
+### Rename digital assets
+
+```text
+Create a Salsify Digital Asset Renaming formula that uses "SKU", a hyphen, and an alphabetical asset index. Preserve the original file extension.
+```
+
+### Troubleshoot a formula
+
+```text
+Troubleshoot this Salsify Computed Property formula.
+Explain the problem, correct it, preserve its current null behavior, and validate every function used:
+
+PASTE_FORMULA_HERE
+```
+
+## A good request includes
+
+- The formula area: Computed Property, Templated Export, Readiness Report, Bulk Edit, or Asset Renaming
 - Exact property IDs
-- Example stored values
-- Required output
-- Behavior for null, blank, or unmatched values
-- Whether the result must be a scalar or an array
+- A few example stored values
+- The expected output
+- What should happen for blank, null, or unmatched values
+- Whether the output should be text, a number, a boolean, an array, or a delimited string
 
-## General request examples
-
-These prompts work with either client. Add `$salsify-formula-writer` in Codex or `/salsify-formula-writer` in Claude Code when you want to invoke the skill explicitly.
-
-### Simple fallback
+Copy this template:
 
 ```text
-Create a Computed Property formula that returns the value of "Brand" when it exists and "Unknown" when it is blank.
-```
-
-### Conditional department mapping
-
-```text
-Create a Computed Property formula using "iq_department". Return 10 for Skincare, Makeup, Fragrances, Hair Care, Bath & Body, and Tools & Brushes. Return 3 for any other populated department and null when the property is blank.
-```
-
-### Readiness check
-
-```text
-Create a Readiness Report formula that returns true only when both "Brand" and "Product Title" have values. Return false otherwise.
-```
-
-### Join a multi-value property
-
-```text
-Create a Templated Export formula that joins every value from "Bullet Points" with a pipe surrounded by spaces: " | ". Include the multiline verification version and the one-line copy version.
-```
-
-### Clean and normalize text
-
-```text
-Create a Computed Property formula that removes HTML from "Description", trims unnecessary whitespace, and returns null when Description is blank.
-```
-
-### Convert measurements
-
-```text
-Create a Computed Property formula that converts "Product Length" from inches to centimeters by multiplying by 2.54. Round the result to two decimal places and preserve null when Product Length is blank.
-```
-
-### In-app bulk edit
-
-```text
-Create an In-app Bulk Edit formula that converts "Brand" to proper case only when Brand has a value. Leave products with no Brand unchanged.
-```
-
-### Templated Export threshold
-
-```text
-Create a Templated Export formula that returns 1 when "calc_max_sale_qty" is greater than 0 and returns 0 otherwise.
-```
-
-### Digital asset renaming
-
-```text
-Create a Digital Asset Renaming formula that names each asset using the product's "SKU", a hyphen, and an alphabetical asset index. Preserve the original file extension.
-```
-
-### Debug an existing formula
-
-```text
-Troubleshoot this Salsify Computed Property formula. Explain the defect, correct it, preserve its current null behavior, and validate every function used:
-
-PASTE_FORMULA_HERE
-```
-
-### Explain and document a formula
-
-```text
-Explain this Salsify formula line by line. List every function, its purpose, compatible formula areas, expected null behavior, and a sample result:
-
-PASTE_FORMULA_HERE
-```
-
-### Optimize a complex formula
-
-```text
-Rewrite this Computed Property formula to make it easier to maintain. Use variables when they reduce repetition, preserve the exact output behavior, and explain each change:
-
-PASTE_FORMULA_HERE
-```
-
-### Reusable request template
-
-```text
-Create a [FORMULA AREA] formula.
+Create a Salsify [FORMULA AREA] formula.
 
 Property IDs:
 - [PROPERTY_ID]: [DESCRIPTION OR SAMPLE VALUE]
 
 Rules:
-1. [FIRST CONDITION AND OUTPUT]
-2. [SECOND CONDITION AND OUTPUT]
-3. [DEFAULT OR UNMATCHED BEHAVIOR]
+1. [CONDITION] -> [OUTPUT]
+2. [CONDITION] -> [OUTPUT]
+3. Default -> [OUTPUT]
 
 Blank/null behavior:
-- [DESCRIBE REQUIRED RESULT]
+- [REQUIRED RESULT]
 
-Output:
-- [TEXT, NUMBER, BOOLEAN, ARRAY, OR DELIMITED STRING]
-
-Examples:
+Example:
 - [INPUT] -> [EXPECTED OUTPUT]
 ```
 
-## Templated Export output
+## What the skill checks
 
-Templated Export functions receive the `SALSIFY_` prefix. The skill returns two equivalent forms.
+- Function names and argument structure
+- Compatibility with the requested Salsify formula area
+- Templated Export `SALSIFY_` prefixes
+- One-line Templated Export output
+- Balanced parentheses and brackets
+- Straight quotes instead of smart quotes
+- Null and default behavior
 
-Verification form:
-
-```text
-SALSIFY_IF(
-  SALSIFY_GT(
-    SALSIFY_VALUE("calc_max_sale_qty"),
-    "0"
-  ),
-  "1",
-  "0"
-)
-```
-
-Copy-ready form:
-
-```text
-SALSIFY_IF(SALSIFY_GT(SALSIFY_VALUE("calc_max_sale_qty"),"0"),"1","0")
-```
-
-## Formula validation
-
-The linter requires Python 3.10 or newer and has no third-party dependencies.
-
-Validate a general formula:
-
-```bash
-python skill-src/salsify-formula-writer/scripts/lint_formula.py formula.txt
-```
-
-Validate a Templated Export formula:
-
-```bash
-python skill-src/salsify-formula-writer/scripts/lint_formula.py --context templated-export formula.txt
-```
-
-Require the Templated Export formula to be one line and comment-free:
-
-```bash
-python skill-src/salsify-formula-writer/scripts/lint_formula.py --context templated-export --require-one-line formula.txt
-```
-
-Supported context values:
-
-- `computed-property`
-- `in-app-bulk-edit`
-- `salsibot-product-edit`
-- `digital-asset-renaming`
-- `templated-export`
-- `readiness-report`
-
-## Updating the skill
-
-The normalized source references are stored at the repository root. Extraction utilities are in `scripts/`, and the installable package is in `skill-src/salsify-formula-writer`.
-
-After updating formulas or references:
-
-1. Synchronize the changed files into `skill-src/salsify-formula-writer`.
-2. Run the formula linter against representative formulas.
-3. Validate `skill-src/salsify-formula-writer/SKILL.md` against the Agent Skills specification.
-4. Test one in-app formula and one Templated Export formula in the relevant Salsify environment.
+The bundled linter performs local syntax and compatibility checks. It does not execute formulas or verify property IDs inside your Salsify organization.
 
 ## Documentation
 

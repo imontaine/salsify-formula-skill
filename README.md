@@ -1,86 +1,94 @@
 # Salsify Formula Writer
 
-A reusable AI skill for creating, explaining, validating, and troubleshooting formulas in the Salsify ProductXM formula language.
+Create Salsify formulas by describing the business rule in plain language.
 
-It works with both Claude Code and OpenAI Codex and includes the Salsify function cheat sheet, examples, compatibility rules, arrays, variables, time zones, and Templated Export requirements.
+If you can explain the rule as an Excel formula - for example, "If Category is R/C Cars, return Y; otherwise return N" - you can use this skill. You do not need to know Salsify's formula syntax.
 
-## Install it globally
+The skill works with Claude Code and OpenAI Codex.
 
-You do not need to copy files manually. Ask your AI coding agent to install the skill from this repository.
+## Install the skill
+
+Ask Claude Code or Codex to install the skill globally from this repository. You only need to do this once.
 
 ### Claude Code
 
-Paste this into Claude Code:
+Paste this request into Claude Code:
 
 ```text
 Install the salsify-formula-writer skill globally from this GitHub repository:
 https://github.com/imontaine/salsify-formula-skill
 
-The skill folder in the repository is:
+The skill folder is:
 skill-src/salsify-formula-writer
 ```
 
 ### Codex
 
-Paste this into Codex:
+Paste this request into Codex:
 
 ```text
 $skill-installer Install the salsify-formula-writer skill globally from this GitHub repository:
 https://github.com/imontaine/salsify-formula-skill
 
-The skill folder in the repository is:
+The skill folder is:
 skill-src/salsify-formula-writer
 ```
 
-## Use the skill
+## Ask for a formula
 
-### Claude Code
-
-Type `/salsify-formula-writer`, followed by your request:
+In Claude Code, begin your request with:
 
 ```text
-/salsify-formula-writer Create a Salsify Computed Property formula that returns "Unknown" when Brand is blank and otherwise returns Brand.
+/salsify-formula-writer
 ```
 
-### Codex
-
-Type `$salsify-formula-writer`, followed by your request:
+In Codex, begin your request with:
 
 ```text
-$salsify-formula-writer Create a Salsify Computed Property formula that returns "Unknown" when Brand is blank and otherwise returns Brand.
+$salsify-formula-writer
 ```
 
-Both clients can also activate the skill automatically when you ask for a Salsify formula. Explicitly invoking it makes sure the specialized references and validator are used.
+Then describe the rule as you would explain it to a coworker:
 
-> The default Claude command is `/salsify-formula-writer`, not `/salsify`, because the command comes from the installed skill directory name.
+```text
+/salsify-formula-writer Create a Computed Property formula.
+If Brand is blank, return "Unknown". Otherwise, return Brand.
+```
 
-## Always name the formula area
+The full Claude command is `/salsify-formula-writer`, not `/salsify`. You can also ask naturally for a Salsify formula, but using the command makes the request explicit.
 
-This is the most important part of the request. Salsify syntax and function compatibility change depending on where the formula will be used.
+## Tell the skill where the formula will be used
 
-| Formula area | How to ask | Important behavior |
-| --- | --- | --- |
-| Computed Property | "Create a Salsify Computed Property formula..." | Uses normal function names such as `IF` and `VALUE`. |
-| Templated Export | "Create a Salsify Templated Export formula..." | Every function needs the `SALSIFY_` prefix. The final formula must be one line. |
-| Readiness Report | "Create a Salsify Readiness Report formula..." | Uses normal unprefixed function names. |
-| In-app Bulk Edit | "Create a Salsify In-app Bulk Edit formula..." | The skill checks every function for Bulk Edit compatibility. |
-| Digital Asset Renaming | "Create a Salsify Digital Asset Renaming formula..." | Only asset-renaming-compatible functions may be used. |
+This is the most important detail. The same business rule is written differently depending on where the formula goes.
 
-Salsify calls a calculated property a **Computed Property**. The skill understands either phrase, but using "Computed Property" is clearest.
+| Where it will be used | What that means |
+| --- | --- |
+| Computed Property | A calculated field inside Salsify, similar to a calculated column in Excel. |
+| Templated Export | A formula that fills a field in a retailer or customer export template. |
+| Readiness Report | A check that shows whether product content is complete or ready. |
+| In-app Bulk Edit | A formula used to update many products inside Salsify. |
+| Digital Asset Renaming | A formula used to create delivery names for images and other assets. |
+
+Salsify also refers to a calculated property as a **Computed Property**. Either phrase is fine.
 
 ## Computed Property vs. Templated Export
 
-Here is the same business rule requested in the two different contexts.
+Here is one business rule used in two different places:
+
+> For "Batteries Included?", return Y when Category is R/C Cars. Return N for every other category. Leave the result blank when Category is blank.
 
 ### Ask for a Computed Property
 
 ```text
-Create a Salsify Computed Property formula for the property "Category".
-Return "Y" when Category is "R/C Cars" and return "N" for every other category.
-Return null when Category is blank.
+/salsify-formula-writer Create a Computed Property formula for "Batteries Included?".
+
+Use the "Category" property.
+- If Category is "R/C Cars", return "Y".
+- For every other category, return "N".
+- If Category is blank, return null.
 ```
 
-The generated functions are unprefixed:
+The skill returns a formula like this:
 
 ```text
 IF(
@@ -93,13 +101,17 @@ IF(
 ### Ask for a Templated Export
 
 ```text
-Create a Salsify Templated Export formula for the property "Category".
-Return "Y" when Category is "R/C Cars" and return "N" for every other category.
-Return null when Category is blank.
-Give me a readable multiline version for verification and a one-line version to paste into the formula box.
+/salsify-formula-writer Create a Templated Export formula for "Batteries Included?".
+
+Use the "Category" property.
+- If Category is "R/C Cars", return "Y".
+- For every other category, return "N".
+- If Category is blank, return null.
+
+Give me a readable multiline version to review and a one-line version to paste into Salsify.
 ```
 
-The verification version uses `SALSIFY_` on every function:
+The skill first gives you a readable version:
 
 ```text
 SALSIFY_IF(
@@ -113,117 +125,128 @@ SALSIFY_IF(
 )
 ```
 
-The skill also returns the required one-line version:
+It also gives you the one-line version required by the Templated Export formula box:
 
 ```text
 SALSIFY_IF(SALSIFY_VALUE("Category"),SALSIFY_IF(SALSIFY_EQUAL(SALSIFY_VALUE("Category"),"R/C Cars"),"Y","N"),null)
 ```
 
-## Examples from the Salsify cheat sheet
+You do not need to remember the `SALSIFY_` wording. The skill adds it when you say the formula is for a Templated Export.
 
-### Return a default value
+## More examples
+
+These examples are based on common Salsify formula use cases. Copy one and replace the property names or business rules with your own.
+
+### Use a backup value when the first field is blank
 
 ```text
-Create a Salsify Computed Property formula that returns the first populated value from "Brand", "Manufacturer", or "Supplier Name". Return "Unknown" when all three properties are blank.
+$salsify-formula-writer Create a Computed Property formula.
+Use the first field that has a value: Brand, Manufacturer, or Supplier Name.
+If all three are blank, return "Unknown".
 ```
 
-### Add leading zeros
+### Add leading zeros to a UPC
 
 ```text
-Create a Salsify Computed Property formula that pads "UPC" with leading zeros until it contains 12 characters. Preserve null when UPC is blank.
+$salsify-formula-writer Create a Computed Property formula.
+Add leading zeros to UPC until it is 12 characters long.
+If UPC is blank, leave the result blank.
 ```
 
-### Change date formatting
+### Format a date for a retailer
 
 ```text
-Create a Salsify Templated Export formula that formats "Launch Date" as MM/DD/YYYY. Include the multiline verification formula and the one-line copy formula.
+$salsify-formula-writer Create a Templated Export formula.
+Format Launch Date as MM/DD/YYYY.
+If Launch Date is blank, leave the result blank.
+Give me the readable version and the one-line copy version.
 ```
 
 ### Convert inches to centimeters
 
 ```text
-Create a Salsify Computed Property formula that converts "Product Length" from inches to centimeters by multiplying by 2.54. Round to two decimal places and return null when Product Length is blank.
+$salsify-formula-writer Create a Computed Property formula.
+Convert Product Length from inches to centimeters by multiplying it by 2.54.
+Round the result to two decimal places.
+If Product Length is blank, leave the result blank.
 ```
 
-### Create a true/false readiness check
+### Check whether required content is complete
 
 ```text
-Create a Salsify Readiness Report formula that returns true when both "Brand" and "Product Title" contain values. Return false otherwise.
+$salsify-formula-writer Create a Readiness Report formula.
+Return true when both Brand and Product Title have values.
+Return false when either one is blank.
 ```
 
-### Join multiple values
+### Combine bullet points into one export field
 
 ```text
-Create a Salsify Templated Export formula that joins every value from "Bullet Points" using a pipe with spaces around it: " | ".
+$salsify-formula-writer Create a Templated Export formula.
+Combine all values from Bullet Points into one field.
+Put " | " between each bullet point.
+Give me the readable version and the one-line copy version.
 ```
 
-### Remove unwanted characters
+### Clean up a product name
 
 ```text
-Create a Salsify Computed Property formula that removes special characters and symbols from "Product Name" while keeping letters, numbers, spaces, and hyphens.
+$salsify-formula-writer Create a Computed Property formula.
+Remove special characters from Product Name.
+Keep letters, numbers, spaces, and hyphens.
+If Product Name is blank, leave the result blank.
 ```
 
-### Rename digital assets
+### Troubleshoot an existing formula
 
 ```text
-Create a Salsify Digital Asset Renaming formula that uses "SKU", a hyphen, and an alphabetical asset index. Preserve the original file extension.
+$salsify-formula-writer Troubleshoot this Computed Property formula.
+Explain the problem in plain language, correct it, and keep the same blank-value behavior:
+
+PASTE FORMULA HERE
 ```
 
-### Troubleshoot a formula
+## A simple request template
 
-```text
-Troubleshoot this Salsify Computed Property formula.
-Explain the problem, correct it, preserve its current null behavior, and validate every function used:
+You do not need to use technical terms. Include these five things when you can:
 
-PASTE_FORMULA_HERE
-```
-
-## A good request includes
-
-- The formula area: Computed Property, Templated Export, Readiness Report, Bulk Edit, or Asset Renaming
-- Exact property IDs
-- A few example stored values
-- The expected output
-- What should happen for blank, null, or unmatched values
-- Whether the output should be text, a number, a boolean, an array, or a delimited string
+1. Where the formula will be used.
+2. The Salsify property names.
+3. The business rule.
+4. What should happen when a value is blank.
+5. One or two examples of the expected result.
 
 Copy this template:
 
 ```text
-Create a Salsify [FORMULA AREA] formula.
+Create a Salsify [Computed Property / Templated Export / Readiness Report] formula.
 
-Property IDs:
-- [PROPERTY_ID]: [DESCRIPTION OR SAMPLE VALUE]
+Use these properties:
+- [PROPERTY NAME]
+- [PROPERTY NAME]
 
-Rules:
-1. [CONDITION] -> [OUTPUT]
-2. [CONDITION] -> [OUTPUT]
-3. Default -> [OUTPUT]
+Business rule:
+- If [CONDITION], return [RESULT].
+- Otherwise, return [RESULT].
 
-Blank/null behavior:
-- [REQUIRED RESULT]
+When a value is blank:
+- [LEAVE BLANK / USE A DEFAULT VALUE / OTHER RULE]
 
-Example:
-- [INPUT] -> [EXPECTED OUTPUT]
+Examples:
+- [EXAMPLE INPUT] should return [EXPECTED RESULT].
 ```
 
-## What the skill checks
+## What the skill handles for you
 
-- Function names and argument structure
-- Compatibility with the requested Salsify formula area
-- Templated Export `SALSIFY_` prefixes
-- One-line Templated Export output
-- Balanced parentheses and brackets
-- Straight quotes instead of smart quotes
-- Null and default behavior
+- Chooses the correct Salsify functions for the business rule.
+- Checks that each function can be used in the requested formula area.
+- Handles blank values and default values.
+- Adds the required `SALSIFY_` wording for Templated Exports.
+- Provides both a readable formula and a one-line copy formula for Templated Exports.
+- Explains complicated formulas in plain language.
+- Checks common problems such as missing parentheses or incorrect quotation marks.
 
-The bundled linter performs local syntax and compatibility checks. It does not execute formulas or verify property IDs inside your Salsify organization.
-
-## Documentation
-
-- [Agent Skills specification](https://agentskills.io/specification)
-- [Codex skill documentation](https://learn.chatgpt.com/docs/build-skills)
-- [Claude Code skill documentation](https://code.claude.com/docs/en/skills)
+The skill checks the formula against its included Salsify documentation. It cannot see your Salsify organization, so make sure the property names match your organization and preview the result in Salsify before using it for a production export.
 
 ## License
 

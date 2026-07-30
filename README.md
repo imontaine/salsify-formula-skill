@@ -133,6 +133,111 @@ Invoke it explicitly with `/salsify-formula-writer`:
 
 Claude Code may also activate the skill automatically when a request matches its description.
 
+## General request examples
+
+These prompts work with either client. Add `$salsify-formula-writer` in Codex or `/salsify-formula-writer` in Claude Code when you want to invoke the skill explicitly.
+
+### Simple fallback
+
+```text
+Create a Computed Property formula that returns the value of "Brand" when it exists and "Unknown" when it is blank.
+```
+
+### Conditional department mapping
+
+```text
+Create a Computed Property formula using "iq_department". Return 10 for Skincare, Makeup, Fragrances, Hair Care, Bath & Body, and Tools & Brushes. Return 3 for any other populated department and null when the property is blank.
+```
+
+### Readiness check
+
+```text
+Create a Readiness Report formula that returns true only when both "Brand" and "Product Title" have values. Return false otherwise.
+```
+
+### Join a multi-value property
+
+```text
+Create a Templated Export formula that joins every value from "Bullet Points" with a pipe surrounded by spaces: " | ". Include the multiline verification version and the one-line copy version.
+```
+
+### Clean and normalize text
+
+```text
+Create a Computed Property formula that removes HTML from "Description", trims unnecessary whitespace, and returns null when Description is blank.
+```
+
+### Convert measurements
+
+```text
+Create a Computed Property formula that converts "Product Length" from inches to centimeters by multiplying by 2.54. Round the result to two decimal places and preserve null when Product Length is blank.
+```
+
+### In-app bulk edit
+
+```text
+Create an In-app Bulk Edit formula that converts "Brand" to proper case only when Brand has a value. Leave products with no Brand unchanged.
+```
+
+### Templated Export threshold
+
+```text
+Create a Templated Export formula that returns 1 when "calc_max_sale_qty" is greater than 0 and returns 0 otherwise.
+```
+
+### Digital asset renaming
+
+```text
+Create a Digital Asset Renaming formula that names each asset using the product's "SKU", a hyphen, and an alphabetical asset index. Preserve the original file extension.
+```
+
+### Debug an existing formula
+
+```text
+Troubleshoot this Salsify Computed Property formula. Explain the defect, correct it, preserve its current null behavior, and validate every function used:
+
+PASTE_FORMULA_HERE
+```
+
+### Explain and document a formula
+
+```text
+Explain this Salsify formula line by line. List every function, its purpose, compatible formula areas, expected null behavior, and a sample result:
+
+PASTE_FORMULA_HERE
+```
+
+### Optimize a complex formula
+
+```text
+Rewrite this Computed Property formula to make it easier to maintain. Use variables when they reduce repetition, preserve the exact output behavior, and explain each change:
+
+PASTE_FORMULA_HERE
+```
+
+### Reusable request template
+
+```text
+Create a [FORMULA AREA] formula.
+
+Property IDs:
+- [PROPERTY_ID]: [DESCRIPTION OR SAMPLE VALUE]
+
+Rules:
+1. [FIRST CONDITION AND OUTPUT]
+2. [SECOND CONDITION AND OUTPUT]
+3. [DEFAULT OR UNMATCHED BEHAVIOR]
+
+Blank/null behavior:
+- [DESCRIBE REQUIRED RESULT]
+
+Output:
+- [TEXT, NUMBER, BOOLEAN, ARRAY, OR DELIMITED STRING]
+
+Examples:
+- [INPUT] -> [EXPECTED OUTPUT]
+```
+
 ## Templated Export output
 
 Templated Export functions receive the `SALSIFY_` prefix. The skill returns two equivalent forms.

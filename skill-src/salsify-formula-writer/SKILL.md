@@ -46,6 +46,7 @@ Prefer the June 2026 function reference when it conflicts with a May 2025 articl
 - Prefer `CONCATENATE` over legacy `CONCAT` unless preserving a known working formula.
 - Declare variables before use with lowercase `let ... in`; variable names are case-sensitive and cannot contain spaces.
 - Preserve array output unless the requirement calls for a string. Use `JOIN` only when a delimiter or scalar is required.
+- Treat `MATCHES` and `REGEX_MATCHES` as array-returning functions. When a single conditional output is required, never pass either function directly as an `IF` test: multiple matches can repeat the true result. Scalarize first, for example `IF(JOIN(MATCHES(text, regex),""),"Brown")`. Do not rely on an outer `UNIQ` to deduplicate values nested inside a matcher result.
 - Use exact accepted time-zone names, including parenthetical text.
 - Preserve empty-value behavior deliberately. Do not add defaults or conditionals without explaining the behavior change.
 - Check every function in the formula against its explicit compatibility fields. Do not infer compatibility from similar functions.
@@ -79,6 +80,8 @@ python scripts/lint_formula.py --context templated-export --require-one-line for
 The linter checks balanced delimiters, string literals, smart quotes, unresolved placeholders, unknown or legacy calls, and noncanonical casing.
 
 Then manually confirm the signature, parameter order, every function's context compatibility, array/scalar behavior, indexing, optional parameters, missing-value behavior, and expected sample output.
+
+For keyword classifiers, test at least one input containing multiple synonyms from the same output family and one input spanning multiple families. Confirm that each intended output appears exactly once; the linter cannot execute the formula or prove runtime cardinality.
 
 ## Response format
 

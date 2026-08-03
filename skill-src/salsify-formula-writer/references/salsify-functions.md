@@ -2067,6 +2067,14 @@ LTRIM(VALUE('UPC'), 11)
 
 Finds a string of characters inside a specified search location, in most cases a property value or variable. Search string accepts REGEX. Combine with other formulas to perform actions on found string.
 
+**Array behavior:** Returns every match as an array. Passing `MATCHES` directly as an `IF` test can apply the true result once per match and produce duplicate labels. When the requirement is one label if any match exists, scalarize the match array first, for example:
+
+```text
+IF(JOIN(MATCHES(bigstring,'bronze|brown|cognac'),''),'Brown')
+```
+
+An outer `UNIQ` may not remove duplicates nested inside a matcher result; scalarize before `IF` rather than depending on downstream deduplication.
+
 **Syntax**
 
 ```text
@@ -2788,6 +2796,14 @@ REFERENCED_VALUE('Bundle Components', 'salsify:universal:universal_tags')
 **Not compatible with:** None
 
 For our users familiar with regular expressions, the REGEX_MATCHES function uses a regular expression to extract matching text from a longer string.
+
+**Array behavior:** Returns every regex match as an array. Passing `REGEX_MATCHES` directly as an `IF` test can apply the true result once per match and produce duplicate labels. When the requirement is one label if any match exists, scalarize the match array first, for example:
+
+```text
+IF(JOIN(REGEX_MATCHES(bigstring,'bronze|brown|cognac'),''),'Brown')
+```
+
+An outer `UNIQ` may not remove duplicates nested inside a matcher result; scalarize before `IF` rather than depending on downstream deduplication.
 
 **Syntax**
 

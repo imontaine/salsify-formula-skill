@@ -20,6 +20,10 @@ SMART_QUOTES = {
 LEGACY_OR_UNDOCUMENTED = {"CONCAT", "LEFT", "RIGHT"}
 HEADING_RE = re.compile(r"^### ([A-Z][A-Z0-9_.]*)(?: .*)?$", re.MULTILINE)
 CALL_RE = re.compile(r"\b([A-Za-z_][A-Za-z0-9_]*)\s*\(")
+ARRAY_MATCHER_IF_RE = re.compile(
+    r"\b(?:SALSIFY_)?IF\s*\(\s*(?:SALSIFY_)?(MATCHES|REGEX_MATCHES)\s*\(",
+    re.IGNORECASE,
+)
 SALSIFY_PREFIX = "SALSIFY_"
 CONTEXTS = {
     "computed-property": "Computed Property Formulas",
@@ -161,6 +165,16 @@ def lint(
 
     if re.search(r"\{\{[^{}]+\}\}", formula):
         warnings.append("Formula contains unresolved {{placeholders}}.")
+
+    direct_matcher_tests = {
+        match.group(1).upper() for match in ARRAY_MATCHER_IF_RE.finditer(masked)
+    }
+    for matcher in sorted(direct_matcher_tests):
+        warnings.append(
+            f"{matcher} returns an array when used directly as an IF test and can "
+            "repeat the true output once per match. Scalarize it first, for example "
+            f'IF(JOIN({matcher}(...),""),"result").'
+        )
 
     seen_calls: set[str] = set()
     for match in CALL_RE.finditer(masked):
